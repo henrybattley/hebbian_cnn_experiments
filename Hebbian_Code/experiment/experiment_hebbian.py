@@ -9,10 +9,17 @@ from models.model_hebb import Net_Hebbian
 import matplotlib.pyplot as plt
 import warnings
 
-from utils.logger import Logger
+
+
+#Their utils directory is missing from the repo!
+#from utils.logger import Logger
+
+
 from torchmetrics import Accuracy, Precision, Recall, F1Score, ConfusionMatrix
 import seaborn as sns
-import wandb
+
+#import wandb #seems only to be used with the logger (which is missing)
+
 from visualisation.visualizer import plot_ltp_ltd, print_weight_statistics, visualize_data_clusters
 from visualisation.receptive_fields import visualize_filters
 from visualisation.whole_image_receptive_field import visualize_receptive_fields_context, clear_image_cache
@@ -121,9 +128,11 @@ if __name__ == "__main__":
     model = Net_Hebbian(hebb_params=hebb_param, version="softhebb")
     model.to(device)
 
+    """ again there is no logger in this repo
     wandb_logger = Logger(
         f"SoftHebb_Optimal",project='CIFAR10_Dataset', model=model)
-    logger = wandb_logger.get_logger()
+    logger = wandb_logger.get_logger() 
+    """
     print(hebb_param)
     num_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Parameter Count Total: {num_parameters}")
@@ -294,11 +303,36 @@ if __name__ == "__main__":
         train_preds = torch.cat(train_preds, dim=0)
         train_labels = torch.cat(train_labels, dim=0)
         acc, prec, rec, f1_score, conf_matrix = calculate_metrics(train_preds, train_labels, 10)
-        logger.log({'train_accuracy': acc, 'train_precision': prec, 'train_recall': rec, 'train_f1_score': f1_score})
-        f, ax = plt.subplots(figsize=(15, 10))
-        sns.heatmap(conf_matrix.clone().detach().cpu().numpy(), annot=True, ax=ax)
-        logger.log({"train_confusion_matrix": wandb.Image(f)})
-        plt.close(f)
+
+        """ again no logger
+        logger.log({'train_accuracy': acc, 'train_precision': prec, 'train_recall': rec, 'train_f1_score': f1_score})"""
+        
+        print(
+        f"Train | "
+        f"Accuracy: {acc.item():.4f} | "
+        f"Precision: {prec.item():.4f} | "
+        f"Recall: {rec.item():.4f} | "
+        f"F1: {f1_score.item():.4f}"
+    )
+
+        #f, ax = plt.subplots(figsize=(15, 10))
+        #sns.heatmap(conf_matrix.clone().detach().cpu().numpy(), annot=True, ax=ax)
+        #logger.log({"train_confusion_matrix": wandb.Image(f)})
+        #plt.close(f)
+
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(
+            conf_matrix.detach().cpu().numpy(),
+            annot=True,
+            fmt="d"
+        )
+        plt.title("Train Confusion Matrix")
+        plt.xlabel("Predicted")
+        plt.ylabel("True")
+        plt.show()
+
+
+
 
         # Evaluation on test set
         model.eval()
@@ -332,11 +366,21 @@ if __name__ == "__main__":
         test_preds = torch.cat(test_preds, dim=0)
         test_labels = torch.cat(test_labels, dim=0)
         acc, prec, rec, f1_score, conf_matrix = calculate_metrics(test_preds, test_labels, 10)
+        """ 
         logger.log({'test_accuracy': acc, 'test_precision': prec, 'test_recall': rec, 'test_f1_score': f1_score})
         f, ax = plt.subplots(figsize=(15, 10))
         sns.heatmap(conf_matrix.clone().detach().cpu().numpy(), annot=True, ax=ax)
         logger.log({"test_confusion_matrix": wandb.Image(f)})
-        plt.close(f)
+        plt.close(f)"""
+
+        #again changing to printing
+        print(
+        f"Test  | "
+        f"Accuracy: {acc.item():.4f} | "
+        f"Precision: {prec.item():.4f} | "
+        f"Recall: {rec.item():.4f} | "
+        f"F1: {f1_score.item():.4f}"
+        )
 
         # Step the scheduler after each epoch
         scheduler.step()
