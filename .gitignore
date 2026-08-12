@@ -14,3 +14,22 @@
 /Hebbian_Code/models/__pycache__
 /.idea
 /.idea
+
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Local datasets
+datasets/
+data/
+
+# Experiment outputs
+results/
+runs/
+
+# Jupyter
+*.ipynb_checkpoints
+
+# Python caches
+.pytest_cache/
