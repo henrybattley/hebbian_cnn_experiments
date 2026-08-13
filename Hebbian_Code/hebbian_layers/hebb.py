@@ -125,6 +125,8 @@ class HebbianConv2d(nn.Module):
         self.use_homeostasis = use_homeostasis
         self.use_structural_plasticity = use_structural_plasticity
 
+
+
         # Existing initialization code
         self.mode = mode
         self.out_channels = out_channels
@@ -168,6 +170,14 @@ class HebbianConv2d(nn.Module):
 
         # Initialize surround modulation kernel only if needed
         if self.use_lateral_inhibition and self.kernel != 1:
+
+
+            """student: adding these so I can inspect them"""
+            self.sigma_e = sigma_e
+            self.sigma_i = sigma_i
+            self.lateral_kernel = lateral_kernel
+
+
             self.sm_kernel = create_sm_kernel(kernel_size=lateral_kernel, sigma_e=sigma_e, sigma_i=sigma_i)
             self.register_buffer('surround_kernel', self.sm_kernel)
             self.visualize_surround_modulation_kernel()
