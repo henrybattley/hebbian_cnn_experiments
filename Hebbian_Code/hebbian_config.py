@@ -84,7 +84,8 @@ def get_hebbian_config(version="softhebb"):
             'mode': 'bcm',
             'use_cosine_similarity': True,
             'use_lateral_inhibition': True,
-            'init_method': 'kaiming_uniform',
+            'init_method':'softhebb',
+            #'init_method': 'kaiming_uniform', # had to change this as the paper details that the normal distribution is optimal
             'dale': False,
             'use_homeostasis': False
         },
