@@ -128,7 +128,7 @@ if __name__ == "__main__":
     model = Net_Hebbian(hebb_params=hebb_param, version="softhebb")
     model.to(device)
 
-    """ again there is no logger in this repo
+    """ again there is no Logger in this repo
     wandb_logger = Logger(
         f"SoftHebb_Optimal",project='CIFAR10_Dataset', model=model)
     logger = wandb_logger.get_logger() 
