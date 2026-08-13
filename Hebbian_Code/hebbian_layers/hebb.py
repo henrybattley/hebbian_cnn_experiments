@@ -576,7 +576,7 @@ class HebbianConv2d(nn.Module):
 
 
 
-    """ removing this so we can have the adaptive optimal lrs 
+  
     # Update method to modify weights without requiring an optimiser
     @torch.no_grad()
     # Weight Update
@@ -588,8 +588,8 @@ class HebbianConv2d(nn.Module):
         else:
             self.weight.copy_(new_weight)
         self.delta_w.zero_()
-    """
-
+    
+    """ 
     @torch.no_grad()
     def local_update(self):
         weight_norm = torch.linalg.norm(
@@ -614,4 +614,4 @@ class HebbianConv2d(nn.Module):
         else:
             self.weight.copy_(new_weight)
 
-        self.delta_w.zero_()
+        self.delta_w.zero_()"""
