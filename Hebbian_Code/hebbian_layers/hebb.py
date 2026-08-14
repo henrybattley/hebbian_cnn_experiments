@@ -53,7 +53,8 @@ class HebbianConv2d(nn.Module):
     """
 	A 2d convolutional layer that learns through Hebbian plasticity
 	"""
-
+    #added the new reconstruction driven hebbian mode
+    MODE_AUTOENCODER = "autoencoder"
     MODE_HPCA = 'hpca'
     MODE_BASIC_HEBBIAN = 'basic'
     MODE_WTA = 'wta'
@@ -318,6 +319,10 @@ class HebbianConv2d(nn.Module):
         """Compute weight updates based on the chosen learning mode."""
         if self.mode == self.MODE_BASIC_HEBBIAN:
             update = self.update_basic_hebbian(x, y, weight)
+
+        elif self.mode == self.MODE_AUTOENCODER:
+            update = self.update_autoencoder(x, y, weight)
+
         elif self.mode == self.MODE_HARDWT:
             update = self.update_hardwt(x, y, weight)
         elif self.mode == self.MODE_SOFTWTA:
@@ -335,6 +340,34 @@ class HebbianConv2d(nn.Module):
         # Weight Normalization and added to weight change buffer
         update.div_(torch.abs(update).amax() + 1e-30)
         self.delta_w += update
+
+    def update_autoencoder(self, x, y, weight):
+
+        updates = []
+
+        for j in range(self.out_channels):
+
+            w_j = weight[j:j+1]
+            y_j = y[:, j:j+1]
+
+            # Individual filter reconstructs the whole input
+            x_hat_j = F.conv_transpose2d(
+                y_j,
+                w_j,
+                stride=self.stride,
+                padding=0,
+                dilation=self.dilation
+            )
+
+            # Reconstruction error
+            error_j = x - x_hat_j
+
+            # Hebbian correlation between activity and reconstruction error
+            update_j = self.compute_yx(error_j, y_j)
+
+            updates.append(update_j)
+
+        return torch.cat(updates, dim=0)
 
     def update_basic_hebbian(self, x, y, weight):
         """Implement basic Hebbian learning (Grossberg Instar rule)."""

@@ -80,6 +80,7 @@ def get_hebbian_config(version="softhebb"):
             'init_method': 'kaiming_uniform',
             'dale': False,
         },
+
         "optimal": {
             'mode': 'bcm',
             'use_cosine_similarity': True,
@@ -88,6 +89,19 @@ def get_hebbian_config(version="softhebb"):
             'dale': False,
             'use_homeostasis': False
         },
+
+
+
+        "autoencoder": {
+            'mode': 'autoencoder',
+            'use_cosine_similarity': False,
+            'use_lateral_inhibition': False,
+            'init_method': 'kaiming_uniform',
+            'dale': False,
+            'use_homeostasis': False,
+            'w_nrm': False
+        },
+
         "dale": {
             'mode': 'bcm',
             'use_cosine_similarity': True,
