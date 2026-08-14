@@ -93,7 +93,7 @@ def get_hebbian_config(version="softhebb"):
 
 
         "reconstruction_hebbian": {
-            'mode': 'autoencoder',
+            'mode': 'reconstruction_hebbian',
             'use_cosine_similarity': False,
             'use_lateral_inhibition': False,
             'init_method': 'kaiming_uniform',
@@ -103,7 +103,7 @@ def get_hebbian_config(version="softhebb"):
         },
 
         "reconstruction_hebbian_wta": {
-            'mode': 'autoencoder_wta',
+            'mode': 'reconstruction_hebbian_wta',
             'use_cosine_similarity': False,
             'use_lateral_inhibition': False,
             'init_method': 'kaiming_uniform',
