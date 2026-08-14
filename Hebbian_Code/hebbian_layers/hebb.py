@@ -54,7 +54,9 @@ class HebbianConv2d(nn.Module):
 	A 2d convolutional layer that learns through Hebbian plasticity
 	"""
     #added the new reconstruction driven hebbian mode
-    MODE_AUTOENCODER = "autoencoder"
+    MODE_RECONSTRUCTION_HEBBIAN = "reconstruction_hebbian"
+    MODE_RECONSTRUCTION_HEBBIAN_WTA = "reconstruction_hebbian_wta"
+
     MODE_HPCA = 'hpca'
     MODE_BASIC_HEBBIAN = 'basic'
     MODE_WTA = 'wta'
@@ -320,8 +322,12 @@ class HebbianConv2d(nn.Module):
         if self.mode == self.MODE_BASIC_HEBBIAN:
             update = self.update_basic_hebbian(x, y, weight)
 
-        elif self.mode == self.MODE_AUTOENCODER:
+
+        elif self.mode == self.MODE_RECONSTRUCTION_HEBBIAN:
             update = self.update_autoencoder(x, y, weight)
+
+        elif self.mode == self.MODE_RECONSTRUCTION_HEBBIAN_WTA:
+            update = self.update_autoencoder_wta(x, y, weight)
 
         elif self.mode == self.MODE_HARDWT:
             update = self.update_hardwt(x, y, weight)
@@ -368,6 +374,44 @@ class HebbianConv2d(nn.Module):
             updates.append(update_j)
 
         return torch.cat(updates, dim=0)
+
+
+    def update_autoencoder_wta(self, x, y, weight):
+
+        # Winner-Take-All competition across filters
+        wta_mask = self.compute_wta_mask(y)
+
+        # Only the winning filter remains active at each spatial location
+        y_wta = y * wta_mask
+
+        updates = []
+
+        for j in range(self.out_channels):
+
+            w_j = weight[j:j+1]
+            y_j = y_wta[:, j:j+1]
+
+            # Individual winning filter reconstructs the whole input
+            x_hat_j = F.conv_transpose2d(
+                y_j,
+                w_j,
+                stride=self.stride,
+                padding=0,
+                dilation=self.dilation
+            )
+
+            # Reconstruction error
+            error_j = x - x_hat_j
+
+            # Reconstruction-error-modulated Hebbian update
+            update_j = self.compute_yx(error_j, y_j)
+
+            updates.append(update_j)
+
+        return torch.cat(updates, dim=0)
+
+
+
 
     def update_basic_hebbian(self, x, y, weight):
         """Implement basic Hebbian learning (Grossberg Instar rule)."""
