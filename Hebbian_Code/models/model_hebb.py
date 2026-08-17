@@ -153,12 +153,20 @@ class Net_Hebbian(nn.Module):
 
         self.flatten = nn.Flatten()
 
-        self.fc1 = nn.Linear(24576, 10)
+        #self.fc1 = nn.Linear(24576, 10)
 
+        self.fc1 = nn.Linear(102400, 10)
+
+        self.fc1.weight.data = (
+        0.11048543456039805 *
+        torch.rand(10, 102400)
+    )
+
+        """
         self.fc1.weight.data = (
             0.11048543456039805 *
             torch.rand(10, 24576)
-        )
+        ) """
 
         self.dropout = nn.Dropout(0.5)
 
