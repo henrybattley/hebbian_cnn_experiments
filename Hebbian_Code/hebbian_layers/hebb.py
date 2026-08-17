@@ -347,16 +347,22 @@ class HebbianConv2d(nn.Module):
         update.div_(torch.abs(update).amax() + 1e-30)
         self.delta_w += update
 
+
     def update_autoencoder(self, x, y, weight):
 
         updates = []
 
-        for j in range(self.out_channels):
+        for j in range(self.out_channels): #out_channels being the n of filters
 
-            w_j = weight[j:j+1]
-            y_j = y[:, j:j+1]
+            w_j = weight[j:j+1] # weight.shape =[out_channels, in_channels, kernel_height,kernel_width] == [96,3,5,5]
+            #we index filter j, but use slice to keep the output channel dimension (the 96 filters) preserved 
+            # ie, weight[0] would give [3,5,5] but we want 4D weight tensor [1,3,5,5]
+            
+            y_j = y[:, j:j+1] # y.shape = [batch, 96, height,width] and second dimension corresponds to our filters
+                            #so we are taking every activation for the batch for the slice of the jth filter
+                            #(more simply: take filter j's activation map from every image in the batch)
 
-            # Individual filter reconstructs the whole input
+            # individual filter reconstructs the whole input
             x_hat_j = F.conv_transpose2d(
                 y_j,
                 w_j,

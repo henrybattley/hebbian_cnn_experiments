@@ -38,7 +38,7 @@ class Net_Hebbian(nn.Module):
     def _build_network(self):
         if self.version == "softhebb":
             self._build_softhebb_network()
-        #extend implementation with the one_layer version of the Journe architecture
+        #extended implementation with the one_layer version of the Journe architecture
         elif self.version == "one_layer":
             self._build_one_layer_network() 
         elif self.version == "mnist":
@@ -96,7 +96,7 @@ class Net_Hebbian(nn.Module):
         self.bn1 = nn.BatchNorm2d(3, affine=False)
         self.conv1 = HebbianConv2d(in_channels=3, out_channels=96, kernel_size=5, stride=1, **self.hebb_params,
                                    padding=2, t_invert=1, bcm_theta=0.3, sigma_e=1.2, sigma_i=1.3, lateral_kernel=5,
-                                   lr=0.1) #modified lr as described in experiment_hebbian.py 
+                                   lr=0.1)
         self.pool1 = nn.MaxPool2d(kernel_size=4, stride=2, padding=1)
         self.activ1 = Triangle(power=0.7)
 
