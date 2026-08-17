@@ -130,7 +130,7 @@ class Net_Hebbian(nn.Module):
 
         self.conv1 = HebbianConv2d(
             in_channels=3,
-            out_channels=96,
+            out_channels=400,
             kernel_size=5,
             stride=1,
             **self.hebb_params,
