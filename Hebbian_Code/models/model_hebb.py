@@ -510,9 +510,14 @@ class Net_Hebbian(nn.Module):
         elif self.version == "softhebb" or self.version == "mnist" or self.version == "miconi":
             x = self.pool2(self.activ2(self.conv2(self.bn2(x))))
             x = self.pool3(self.activ3(self.conv3(self.bn3(x))))
-        #our one layer version just returns as is since the operations are handled by def forward_features
+
+        #our one layer versions of  course just have one sequence of conv operations
         elif self.version == "one_layer":
             return x
+        
+        elif self.version == "one_layer_reduced":
+            return x
+        
         elif self.version == "stl_net" or self.version == "stl10":
             x = self.pool2(self.activ2(self.conv2(self.bn2(x))))
             x = self.pool3(self.activ3(self.conv3(self.bn3(x))))
@@ -528,7 +533,14 @@ class Net_Hebbian(nn.Module):
     def forward(self, x):
         x = self.features_extract(x)
         x = self.flatten(x)
-        x = self.fc1(self.dropout(x))
+
+        """ modified such that the one_layer_reduced model doesn't use dropout"""
+        if self.version == "one_layer_reduced":
+                x = self.fc1(x)
+
+        else:
+                x = self.fc1(self.dropout(x))
+
         if self.version == "tumor":
             x = nn.ReLU()(x)
             x = self.fc2(self.dropout(x))
