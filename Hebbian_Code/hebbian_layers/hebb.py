@@ -684,6 +684,18 @@ class HebbianConv2d(nn.Module):
         else:
             self.weight.copy_(new_weight)
         self.delta_w.zero_()
+
+    @torch.no_grad()
+    def local_custom_update(self,lr):
+        
+        lr = lr.view(-1, 1, 1, 1)
+        new_weight = self.weight + lr * self.alpha * self.delta_w
+        # Update weights
+        if self.dale:
+            self.weight.copy_(new_weight.abs())
+        else:
+            self.weight.copy_(new_weight)
+        self.delta_w.zero_()
     
     """ 
     @torch.no_grad()
