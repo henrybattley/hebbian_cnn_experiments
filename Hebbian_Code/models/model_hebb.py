@@ -206,7 +206,8 @@ class Net_Hebbian(nn.Module):
             torch.rand(10, 4096)
         )
 
-        self.dropout = nn.Dropout(0.5)
+        #removing dropout
+        #self.dropout = nn.Dropout(0.5)
 
 
 
