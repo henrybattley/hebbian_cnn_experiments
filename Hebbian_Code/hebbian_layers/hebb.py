@@ -306,8 +306,9 @@ class HebbianConv2d(nn.Module):
             y = self.act(y)
         return x, y, w
 
+    """
     def forward(self, x):
-        """Modified forward pass to use configured features"""
+        #Modified forward pass to use configured features
         x, y, w = self.compute_activation(x)
         # Apply lateral inhibition if enabled
         if self.use_lateral_inhibition and self.kernel != 1:
@@ -318,7 +319,26 @@ class HebbianConv2d(nn.Module):
             if self.use_structural_plasticity:
                 self.structural_plasticity()
             self.compute_update(x, y, w)
+        return y 
+    """
+
+    def forward(self, x):
+
+        x, y, w = self.compute_activation(x)
+
+        if self.use_lateral_inhibition and self.kernel != 1:
+            y = self.apply_surround_modulation(y)
+
+        # Apply Hard-WTA to the post-synaptic activity
+        if self.mode == self.MODE_BCM:
+            y = y * self.compute_wta_mask(y)
+
+        if self.training:
+            self.compute_update(x, y, w)
+
         return y
+
+    
 
     def compute_update(self, x, y, weight):
         """Compute weight updates based on the chosen learning mode."""
@@ -429,14 +449,18 @@ class HebbianConv2d(nn.Module):
         yw = y_sum * weight
         update = yx - yw
         return update
-
+  
     def update_hardwt(self, x, y, weight):
-        """Implement hard Winner-Take-All (WTA) Hebbian learning."""
+        """Implement hard Winner-Take-All (WTA) Hebbian learning.""" 
+  
         y_wta = y * self.compute_wta_mask(y)
         yx = self.compute_yx(x, y_wta)
         yu = torch.sum(y_wta, dim=(0, 2, 3))
         update = yx - yu.view(-1, 1, 1, 1) * weight
         return update
+    
+
+    
 
     def update_softwta(self, x, y, weight):
         """Implement soft Winner-Take-All Hebbian learning (SoftHebb)."""
@@ -454,8 +478,12 @@ class HebbianConv2d(nn.Module):
         update = yx - yu.view(-1, 1, 1, 1) * weight
         return update
 
-    def update_bcm(self, x, y, weight):
-        """Implement BCM (Bienenstock-Cooper-Munro) learning rule."""
+
+    """ 
+    def update_bcm(self, x, y, weight):"""
+
+    """Implement BCM (Bienenstock-Cooper-Munro) learning rule."""
+    """ 
         y_wta = y * self.compute_wta_mask(y)
         y_squared = y_wta.pow(2).mean(dim=(0, 2, 3))
         self.theta.data = (1 - self.theta_decay) * self.theta + self.theta_decay * y_squared
@@ -464,6 +492,30 @@ class HebbianConv2d(nn.Module):
         yx = self.compute_yx(x, bcm_factor)
         update = yx.view(weight.shape)
         return update
+    """
+    
+    def update_bcm(self, x, y, weight):
+        """Implement BCM (Bienenstock-Cooper-Munro) learning rule."""
+
+        y_wta = y
+
+        y_squared = y_wta.pow(2).mean(dim=(0, 2, 3))
+
+        self.theta.data = (
+            (1 - self.theta_decay) * self.theta
+            + self.theta_decay * y_squared
+        )
+
+        y_minus_theta = y_wta - self.theta.view(1, -1, 1, 1)
+
+        bcm_factor = y_wta * y_minus_theta
+
+        yx = self.compute_yx(x, bcm_factor)
+
+        update = yx.view(weight.shape)
+
+        return update
+    
 
     def update_temporal_competition(self, x, y, weight):
         """Implement temporal competition-based learning."""
@@ -685,41 +737,4 @@ class HebbianConv2d(nn.Module):
             self.weight.copy_(new_weight)
         self.delta_w.zero_()
 
-    @torch.no_grad()
-    def local_custom_update(self,lr):
-        
-        lr = lr.view(-1, 1, 1, 1)
-        new_weight = self.weight + lr * self.alpha * self.delta_w
-        # Update weights
-        if self.dale:
-            self.weight.copy_(new_weight.abs())
-        else:
-            self.weight.copy_(new_weight)
-        self.delta_w.zero_()
     
-    """ 
-    @torch.no_grad()
-    def local_update(self):
-        weight_norm = torch.linalg.norm(
-            self.weight.view(self.weight.shape[0], -1),
-            dim=1
-        )
-
-        adaptive_lr = (
-            self.lr *
-            torch.abs(weight_norm - 1.0).pow(0.5)
-        )
-
-        adaptive_lr = adaptive_lr.view(-1, 1, 1, 1)
-
-        new_weight = (
-            self.weight
-            + adaptive_lr * self.alpha * self.delta_w
-        )
-
-        if self.dale:
-            self.weight.copy_(new_weight.abs())
-        else:
-            self.weight.copy_(new_weight)
-
-        self.delta_w.zero_()"""
