@@ -38,9 +38,15 @@ class Net_Hebbian(nn.Module):
     def _build_network(self):
         if self.version == "softhebb":
             self._build_softhebb_network()
+
         #extended implementation with the one_layer version of the Journe architecture
         elif self.version == "one_layer":
             self._build_one_layer_network() 
+
+        # and a one layer version with 16 filters to be comparable to our GD models
+        elif self.version == "one_layer_reduced":
+            self._build_reduced_one_layer_network() 
+
         elif self.version == "mnist":
             self._build_softhebb_network_grey()
         elif self.version == "tumor":
@@ -130,7 +136,7 @@ class Net_Hebbian(nn.Module):
 
         self.conv1 = HebbianConv2d(
             in_channels=3,
-            out_channels=400,
+            out_channels=96,
             kernel_size=5,
             stride=1,
             **self.hebb_params,
@@ -153,22 +159,57 @@ class Net_Hebbian(nn.Module):
 
         self.flatten = nn.Flatten()
 
-        #self.fc1 = nn.Linear(24576, 10)
+        self.fc1 = nn.Linear(24576, 10)
 
-        self.fc1 = nn.Linear(102400, 10)
-
-        self.fc1.weight.data = (
-        0.11048543456039805 *
-        torch.rand(10, 102400)
-    )
-
-        """
         self.fc1.weight.data = (
             0.11048543456039805 *
             torch.rand(10, 24576)
-        ) """
+        )
 
         self.dropout = nn.Dropout(0.5)
+
+
+    def _build_reduced_one_layer_network(self):
+        print("Building 1-layer Hebbian model")
+
+        self.bn1 = nn.BatchNorm2d(3, affine=False)
+
+        self.conv1 = HebbianConv2d(
+            in_channels=3,
+            out_channels=16,
+            kernel_size=5,
+            stride=1,
+            **self.hebb_params,
+            padding=2,
+            t_invert=1,
+            bcm_theta=0.3,
+            sigma_e=1.2,
+            sigma_i=1.3,
+            lateral_kernel=5,
+            lr=0.1
+        )
+
+        self.pool1 = nn.MaxPool2d(
+            kernel_size=4,
+            stride=2,
+            padding=1
+        )
+
+        self.activ1 = Triangle(power=0.7)
+
+        self.flatten = nn.Flatten()
+
+        self.fc1 = nn.Linear(24576, 10)
+
+        self.fc1.weight.data = (
+            0.11048543456039805 *
+            torch.rand(10, 24576)
+        )
+
+        self.dropout = nn.Dropout(0.5)
+
+
+
 
 
     def _build_softhebb_network_grey(self):
