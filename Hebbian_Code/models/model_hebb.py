@@ -102,7 +102,7 @@ class Net_Hebbian(nn.Module):
         self.bn1 = nn.BatchNorm2d(3, affine=False)
         self.conv1 = HebbianConv2d(in_channels=3, out_channels=96, kernel_size=5, stride=1, **self.hebb_params,
                                    padding=2, t_invert=1, bcm_theta=0.3, sigma_e=1.2, sigma_i=1.3, lateral_kernel=5,
-                                   lr=0.08)
+                                   lr=0.1)
         self.pool1 = nn.MaxPool2d(kernel_size=4, stride=2, padding=1)
         self.activ1 = Triangle(power=0.7)
 
@@ -110,8 +110,8 @@ class Net_Hebbian(nn.Module):
         self.bn2 = nn.BatchNorm2d(96, affine=False)
         self.conv2 = HebbianConv2d(in_channels=96, out_channels=384, kernel_size=3, stride=1, **self.hebb_params,
                                    t_invert=0.65, padding=1, bcm_theta=0.35, sigma_e=1.0, sigma_i=1.2, lateral_kernel=3,
-                                   lr=0.005)
-                                   #lr=0.08)
+                                   #lr=0.005)
+                                   lr=0.08)
         self.pool2 = nn.MaxPool2d(kernel_size=4, stride=2, padding=1)
         self.activ2 = Triangle(power=1.4)
 
@@ -119,8 +119,8 @@ class Net_Hebbian(nn.Module):
         self.bn3 = nn.BatchNorm2d(384, affine=False)
         self.conv3 = HebbianConv2d(in_channels=384, out_channels=1536, kernel_size=3, stride=1, **self.hebb_params,
                                    t_invert=0.25, padding=1, bcm_theta=0.35, sigma_e=0.8, sigma_i=1.1, lateral_kernel=3,
-                                   lr=0.01)
-                                   #lr=0.05)
+                                   #lr=0.01)
+                                   lr=0.05)
         self.pool3 = nn.AvgPool2d(kernel_size=2, stride=2, padding=0)
         self.activ3 = Triangle(power=1.)
 
@@ -212,9 +212,106 @@ class Net_Hebbian(nn.Module):
         #self.dropout = nn.Dropout(0.5)
 
 
+def _build_softhebb_network_grey(self):
+
+    print("Building Optimal-HardWTA Greyscale model")
+
+    # Layer 1
+    self.bn1 = nn.BatchNorm2d(1, affine=False)
+
+    self.conv1 = HebbianConv2d(
+        in_channels=1,
+        out_channels=96,
+        kernel_size=5,
+        stride=1,
+        **self.hebb_params,
+        padding=2,
+        t_invert=1,
+        bcm_theta=0.3,
+        sigma_e=1.2,
+        sigma_i=1.3,
+        lateral_kernel=5,
+        lr=0.1
+    )
+
+    self.pool1 = nn.MaxPool2d(
+        kernel_size=4,
+        stride=2,
+        padding=1
+    )
+
+    self.activ1 = Triangle(power=0.7)
+
+
+    # Layer 2
+    self.bn2 = nn.BatchNorm2d(96, affine=False)
+
+    self.conv2 = HebbianConv2d(
+        in_channels=96,
+        out_channels=384,
+        kernel_size=3,
+        stride=1,
+        **self.hebb_params,
+        t_invert=0.65,
+        padding=1,
+        bcm_theta=0.35,
+        sigma_e=1.0,
+        sigma_i=1.2,
+        lateral_kernel=3,
+        lr=0.08
+    )
+
+    self.pool2 = nn.MaxPool2d(
+        kernel_size=4,
+        stride=2,
+        padding=1
+    )
+
+    self.activ2 = Triangle(power=1.4)
+
+
+    # Layer 3
+    self.bn3 = nn.BatchNorm2d(384, affine=False)
+
+    self.conv3 = HebbianConv2d(
+        in_channels=384,
+        out_channels=1536,
+        kernel_size=3,
+        stride=1,
+        **self.hebb_params,
+        t_invert=0.25,
+        padding=1,
+        bcm_theta=0.35,
+        sigma_e=0.8,
+        sigma_i=1.1,
+        lateral_kernel=3,
+        lr=0.05
+    )
+
+    self.pool3 = nn.AvgPool2d(
+        kernel_size=2,
+        stride=2,
+        padding=0
+    )
+
+    self.activ3 = Triangle(power=1.)
+
+    self.flatten = nn.Flatten()
+
+    # Determine this from an actual forward pass rather than hard-code it
+    self.fc1 = nn.Linear(1536 * 3 * 3, 10)
+
+    self.fc1.weight.data = (
+        0.11048543456039805 *
+        torch.rand(10, 1536 * 3 * 3)
+    )
+
+    self.dropout = nn.Dropout(0.5)
 
 
 
+
+    """
     def _build_softhebb_network_grey(self):
         print("Building SoftHebb Greyscale model")
         # Layer 1
@@ -243,6 +340,9 @@ class Net_Hebbian(nn.Module):
         self.fc1 = nn.Linear(18816, 10)
         self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 18816)
         self.dropout = nn.Dropout(0.5)
+ """
+
+
 
     # For Brain_Tumor dataset
     def _build_network_tumor(self):
