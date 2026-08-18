@@ -272,17 +272,7 @@ class HebbianConv2d(nn.Module):
     def cosine(self, x, w):
         """Compute cosine similarity between input and weights."""
 
-        #w_normalized = F.normalize(w, p=2, dim=1)
-
-        #trying to rectify weight norms
-        w_normalized = F.normalize(
-            w.view(w.shape[0], -1),
-            p=2,
-            dim=1
-        ).view_as(w)
-
-
-
+        w_normalized = F.normalize(w, p=2, dim=1)
 
 
         # conv_output = symmetric_pad(x, self.padding)
