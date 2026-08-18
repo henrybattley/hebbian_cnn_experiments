@@ -306,9 +306,9 @@ class HebbianConv2d(nn.Module):
             y = self.act(y)
         return x, y, w
 
-    """
+   
     def forward(self, x):
-        #Modified forward pass to use configured features
+        """ Modified forward pass to use configured features"""
         x, y, w = self.compute_activation(x)
         # Apply lateral inhibition if enabled
         if self.use_lateral_inhibition and self.kernel != 1:
@@ -320,24 +320,7 @@ class HebbianConv2d(nn.Module):
                 self.structural_plasticity()
             self.compute_update(x, y, w)
         return y 
-    """
-
-    def forward(self, x):
-
-        x, y, w = self.compute_activation(x)
-
-        if self.use_lateral_inhibition and self.kernel != 1:
-            y = self.apply_surround_modulation(y)
-
-        # Apply Hard-WTA to the post-synaptic activity
-        if self.mode == self.MODE_BCM:
-            y = y * self.compute_wta_mask(y)
-
-        if self.training:
-            self.compute_update(x, y, w)
-
-        return y
-
+    
     
 
     def compute_update(self, x, y, weight):
@@ -479,11 +462,11 @@ class HebbianConv2d(nn.Module):
         return update
 
 
-    """ 
-    def update_bcm(self, x, y, weight):"""
+  
+    def update_bcm(self, x, y, weight):
 
-    """Implement BCM (Bienenstock-Cooper-Munro) learning rule."""
-    """ 
+        """Implement BCM (Bienenstock-Cooper-Munro) learning rule."""
+  
         y_wta = y * self.compute_wta_mask(y)
         y_squared = y_wta.pow(2).mean(dim=(0, 2, 3))
         self.theta.data = (1 - self.theta_decay) * self.theta + self.theta_decay * y_squared
@@ -492,29 +475,8 @@ class HebbianConv2d(nn.Module):
         yx = self.compute_yx(x, bcm_factor)
         update = yx.view(weight.shape)
         return update
-    """
-    
-    def update_bcm(self, x, y, weight):
-        """Implement BCM (Bienenstock-Cooper-Munro) learning rule."""
+ 
 
-        y_wta = y
-
-        y_squared = y_wta.pow(2).mean(dim=(0, 2, 3))
-
-        self.theta.data = (
-            (1 - self.theta_decay) * self.theta
-            + self.theta_decay * y_squared
-        )
-
-        y_minus_theta = y_wta - self.theta.view(1, -1, 1, 1)
-
-        bcm_factor = y_wta * y_minus_theta
-
-        yx = self.compute_yx(x, bcm_factor)
-
-        update = yx.view(weight.shape)
-
-        return update
     
 
     def update_temporal_competition(self, x, y, weight):
