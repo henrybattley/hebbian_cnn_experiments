@@ -674,8 +674,9 @@ def get_data(dataset='cifar10', root='datasets', batch_size=32, num_workers=0, w
 
         temp_transform = T.Compose([T.Resize(img_size), T.ToTensor()])
         if dataset == "cifar10":
-            temp_dataset = CIFAR10(root=os.path.join(root, dataset), train=True, download=False,
-            transform=temp_transform)
+            #temp_dataset = CIFAR10(root=os.path.join(root, dataset), train=True, download=False,
+            #transform=temp_transform)
+            print("I removed the temp dataset")
         elif dataset == "stl10":
             temp_dataset = STL10(root=os.path.join(root, dataset), split='train', download=False,
                                  transform=temp_transform)
@@ -684,15 +685,16 @@ def get_data(dataset='cifar10', root='datasets', batch_size=32, num_workers=0, w
             transform=temp_transform)
         elif dataset == "brain_tumor":
             temp_dataset = BrainTumorDataset(os.path.join(root, 'brain_tumor', 'train'), transform=temp_transform)
-        temp_loader = DataLoader(temp_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+
+        #temp_loader = DataLoader(temp_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
         # Get a batch for visualization
-        original_batch, _ = next(iter(temp_loader))
-        print(original_batch.shape)
-        whitened_batch = zca.transform(original_batch)
-        print(whitened_batch.shape)
-        print("\nVisualization of ZCA effect:")
-        visualize_zca_effect(original_batch, whitened_batch)
-        visualize_decorrelation_effect(original_batch, whitened_batch)
+        #original_batch, _ = next(iter(temp_loader))
+        #print(original_batch.shape)
+        #whitened_batch = zca.transform(original_batch)
+        #print(whitened_batch.shape)
+        #print("\nVisualization of ZCA effect:")
+        #visualize_zca_effect(original_batch, whitened_batch)
+        #visualize_decorrelation_effect(original_batch, whitened_batch)
 
         trn_set.transform = full_transform
         tst_set.transform = full_transform
