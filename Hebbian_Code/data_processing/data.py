@@ -722,9 +722,9 @@ def get_data(dataset='cifar10', root='datasets', batch_size=32, num_workers=0, w
         tst_set.transform = transform
 
     trn_loader = DataLoader(trn_set, batch_size=batch_size, shuffle=True,
-                            num_workers=8, persistent_workers=True)
+                            num_workers=2, persistent_workers=True)
     tst_loader = DataLoader(tst_set, batch_size=batch_size, shuffle=True,
-                            num_workers=8, persistent_workers=True)
+                            num_workers=2, persistent_workers=True)
 
     return trn_loader, tst_loader, zca
 
