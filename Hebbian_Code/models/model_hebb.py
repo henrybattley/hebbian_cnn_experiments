@@ -38,6 +38,9 @@ class Net_Hebbian(nn.Module):
     def _build_network(self):
         if self.version == "softhebb":
             self._build_softhebb_network()
+            
+        elif self.version =="softhebbstl":
+            self._build_softhebb_stl_10_network()
 
         #extended implementation with the one_layer version of the Journe architecture
         elif self.version == "one_layer":
@@ -128,6 +131,41 @@ class Net_Hebbian(nn.Module):
         self.flatten = nn.Flatten()
         self.fc1 = nn.Linear(24576, 10)
         self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 24576)
+        self.dropout = nn.Dropout(0.5)
+
+
+    def _build_softhebb_stl_10_network(self):
+        print("Building SoftHebb stl model")
+        # Layer 1
+        self.bn1 = nn.BatchNorm2d(3, affine=False)
+        self.conv1 = HebbianConv2d(in_channels=3, out_channels=96, kernel_size=5, stride=1, **self.hebb_params,
+                                   padding=2, t_invert=1, bcm_theta=0.3, sigma_e=1.2, sigma_i=1.3, lateral_kernel=5,
+                                   lr=0.1)
+        self.pool1 = nn.MaxPool2d(kernel_size=4, stride=2, padding=1)
+        self.activ1 = Triangle(power=0.7)
+
+        # Layer 2
+        self.bn2 = nn.BatchNorm2d(96, affine=False)
+        self.conv2 = HebbianConv2d(in_channels=96, out_channels=384, kernel_size=3, stride=1, **self.hebb_params,
+                                   t_invert=0.65, padding=1, bcm_theta=0.35, sigma_e=1.0, sigma_i=1.2, lateral_kernel=3,
+                                   #lr=0.005)
+                                   lr=0.08)
+        self.pool2 = nn.MaxPool2d(kernel_size=4, stride=2, padding=1)
+        self.activ2 = Triangle(power=1.4)
+
+        # Layer 3
+        self.bn3 = nn.BatchNorm2d(384, affine=False)
+        self.conv3 = HebbianConv2d(in_channels=384, out_channels=1536, kernel_size=3, stride=1, **self.hebb_params,
+                                   t_invert=0.25, padding=1, bcm_theta=0.35, sigma_e=0.8, sigma_i=1.1, lateral_kernel=3,
+                                   #lr=0.01)
+                                   lr=0.05)
+        self.pool3 = nn.AvgPool2d(kernel_size=2, stride=2, padding=0)
+        self.activ3 = Triangle(power=1.)
+
+        # Output layers
+        self.flatten = nn.Flatten()
+        self.fc1 = nn.Linear(221184, 10)
+        self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 221184)
         self.dropout = nn.Dropout(0.5)
 
 
@@ -609,7 +647,7 @@ class Net_Hebbian(nn.Module):
         elif self.version == "hardhebb" or self.version == "lagani_short":
             x = self.activ2(self.conv2(self.bn2(x)))
             x = self.pool3(self.activ3(self.conv3(self.bn3(x))))
-        elif self.version == "softhebb" or self.version == "mnist" or self.version == "miconi":
+        elif self.version == "softhebb" or self.version =="softhebbstl" or self.version == "mnist" or self.version == "miconi":
             x = self.pool2(self.activ2(self.conv2(self.bn2(x))))
             x = self.pool3(self.activ3(self.conv3(self.bn3(x))))
 
