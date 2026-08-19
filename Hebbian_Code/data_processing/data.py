@@ -598,8 +598,13 @@ def get_data(dataset='cifar10', root='datasets', batch_size=32, num_workers=0, w
 
         print("Data Batch whitening")
         # Use BatchZCAWhitening instead of ZCAWhitening
-        zca = ZCAWhitening(epsilon=whiten_lvl)
-        # zca = BatchZCAWhitening(epsilon=1e-3)
+
+        #zca = ZCAWhitening(epsilon=whiten_lvl)
+
+        #using the batchzca whitening as told...
+        zca = BatchZCAWhitening(epsilon=whiten_lvl)
+
+
         # zca = BioDecorrelation(decay_rate=0.5, inhibition_strength=0.5)
         # zca = BlockwiseZCA(block_size=5, stride=1, epsilon=whiten_lvl)
         # Create a temporary dataloader for fitting ZCA
@@ -624,6 +629,9 @@ def get_data(dataset='cifar10', root='datasets', batch_size=32, num_workers=0, w
                 T.RandomHorizontalFlip(),
                 T.Resize((img_size, img_size)),
                 T.ToTensor(),
+
+                #adding the batch zca
+                BatchZCATransformation(zca)
                 # BatchRandomProjectionTransform(zca)
             ])
         else:
