@@ -2,12 +2,14 @@ import os
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
-from torchvision.datasets import CIFAR10, STL10, MNIST
+from torchvision.datasets import CIFAR10, STL10, MNIST, ImageFolder
 from PIL import Image
 import torchvision.transforms as T
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
+
+
 
 # torch.manual_seed(0)
 
@@ -552,15 +554,37 @@ def check_normalization(data):
     print(f"Max: {data_flat.max().item():.6f}")
     print()
 
-def get_data(dataset='cifar10', root='datasets', batch_size=32, num_workers=0, whiten_lvl=None):
+def get_data(dataset='cifar10', root='datasets', batch_size=32, num_workers=0, whiten_lvl=None,kaggle_cifar_path=None):
     trn_set, tst_set = None, None
 
     if dataset == 'cifar10':
+        if kaggle_cifar_path is None:
+            raise ValueError(
+                "kaggle_cifar_path needs to provided for CIFAR-10 dataset."
+            )
+
+        cifar_train_path = os.path.join(kaggle_cifar_path, "train")
+        cifar_test_path = os.path.join(kaggle_cifar_path, "test")
+
+        trn_set = ImageFolder(
+            root=cifar_train_path,
+            transform=T.ToTensor()
+        )
+
+        tst_set = ImageFolder(
+            root=cifar_test_path,
+            transform=T.ToTensor()
+        )
+
+        img_size = 32
+
+
+        """ 
         trn_set = CIFAR10(root=os.path.join(root, dataset), train=True, download=True, transform=T.ToTensor())
         tst_set = CIFAR10(root=os.path.join(root, dataset), train=False, download=True, transform=T.ToTensor())
         # all_data = torch.cat([torch.tensor(trn_set.data), torch.tensor(tst_set.data)], dim=0)
         # all_data = all_data.float() / 255.0
-        img_size = 32
+        img_size = 32"""
 
     elif dataset == 'stl10':
         trn_set = STL10(root=os.path.join(root, dataset), split='train', download=True, transform=T.ToTensor())
