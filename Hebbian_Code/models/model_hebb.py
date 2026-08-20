@@ -249,7 +249,7 @@ class Net_Hebbian(nn.Module):
         #removing dropout
         #self.dropout = nn.Dropout(0.5)
 
-   
+    """
     def _build_softhebb_network_grey(self):
 
         print("Building Optimal-HardWTA Greyscale model")
@@ -345,11 +345,11 @@ class Net_Hebbian(nn.Module):
         )
 
         self.dropout = nn.Dropout(0.5)
+   """ 
+
+
+
    
-
-
-
-    """
     def _build_softhebb_network_grey(self):
         print("Building SoftHebb Greyscale model")
         # Layer 1
@@ -375,10 +375,19 @@ class Net_Hebbian(nn.Module):
 
         # Output layers
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(18816, 10)
-        self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 18816)
+
+        #self.fc1 = nn.Linear(18816, 10) for some reason the dims for the fc are wrong in the repo
+
+        self.fc1 = nn.Linear(1536, 10)
+
+
+        #self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 18816)
+
+        self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 1536)
+
+
         self.dropout = nn.Dropout(0.5)
-        """
+        
 
 
 
