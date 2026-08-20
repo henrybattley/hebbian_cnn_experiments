@@ -36,24 +36,29 @@ class Net_Hebbian(nn.Module):
         self._build_network()
 
     def _build_network(self):
+        # softhebb is the reference to the Journe proposed architecture (with parameters defaulted to be optimal for cifar-10)
         if self.version == "softhebb":
             self._build_softhebb_network()
             
-
-        #extended implementation with the one_layer version of the Journe architecture (for stl-10)
+        #extended implementation with the one_layer version of the Journe architecture (for cifar-10)
         elif self.version == "one_layer":
             self._build_one_layer_network() 
 
-        # and a one layer version with 16 filters to be comparable to our GD models (for stl-10)
+        # and a one layer version with 16 filters to be comparable to our GD models (for cifar-10)
         elif self.version == "one_layer_reduced":
             self._build_reduced_one_layer_network() 
 
+        # one layer version with 16 filters for stl10
+        elif self.version == "one_layer_reduced_stl10":
+            self._build_reduced_one_layer_network_stl10() 
+
+        #greyscale 1-layer version for mnist (and fmnist)
         elif self.version =="one_layer_reduced_greyscale":
             self._build_reduced_greyscale_one_layer_network()
 
+
         elif self.version == "mnist":
             self._build_softhebb_network_grey()
-
         elif self.version == "tumor":
             self._build_network_tumor()
         elif self.version == "hardhebb":
@@ -178,7 +183,7 @@ class Net_Hebbian(nn.Module):
 
         self.dropout = nn.Dropout(0.5)
 
-    # this one layer version also maintains optimal params for cifar-10
+    # this one layer version also maintains optimal params for cifar-10 only it has 16 filters and no dropout
     def _build_reduced_one_layer_network(self):
         print("Building 1-layer Hebbian model")
 
@@ -248,6 +253,7 @@ class Net_Hebbian(nn.Module):
 
         #removing dropout
         #self.dropout = nn.Dropout(0.5)
+
 
     # keep default bcm params and dims for stl-10 1-layer version
     def _build_reduced_stl10_one_layer_network(self):
@@ -592,7 +598,7 @@ class Net_Hebbian(nn.Module):
             x = self.pool3(self.activ3(self.conv3(self.bn3(x))))
 
         #our one layer versions of  course just have one sequence of conv operations
-        elif self.version == "one_layer" or self.version == "one_layer_reduced" or self.version == "one_layer_reduced_greyscale":
+        elif self.version == "one_layer" or self.version == "one_layer_reduced" or self.version == "one_layer_reduced_stl10" or self.version == "one_layer_reduced_greyscale":
             return x
 
         
