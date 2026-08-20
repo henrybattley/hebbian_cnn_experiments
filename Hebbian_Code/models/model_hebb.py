@@ -378,12 +378,12 @@ class Net_Hebbian(nn.Module):
 
         #self.fc1 = nn.Linear(18816, 10) for some reason the dims for the fc are wrong in the repo
 
-        self.fc1 = nn.Linear(1536, 10)
+        self.fc1 = nn.Linear(13824, 10)
 
 
         #self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 18816)
 
-        self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 1536)
+        self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 13824)
 
 
         self.dropout = nn.Dropout(0.5)
