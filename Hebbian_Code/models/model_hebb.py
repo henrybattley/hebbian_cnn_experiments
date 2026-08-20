@@ -249,6 +249,29 @@ class Net_Hebbian(nn.Module):
         #removing dropout
         #self.dropout = nn.Dropout(0.5)
 
+    # keep default bcm params and dims for stl-10 1-layer version
+    def _build_reduced_stl10_one_layer_network(self):
+
+        print("Building 1-layer STL SoftHebb model")
+        # Layer 1
+        self.bn1 = nn.BatchNorm2d(3, affine=False)
+        self.conv1 = HebbianConv2d(in_channels=3, out_channels=16, kernel_size=5, stride=1, **self.hebb_params,
+                                    padding=2, t_invert=1)
+        
+        self.pool1 = nn.MaxPool2d(kernel_size=4, stride=2, padding=1)
+        self.activ1 = Triangle(power=0.7)
+
+
+        # Output layers
+        self.flatten = nn.Flatten()
+
+        self.fc1 = nn.Linear(36864, 10)
+
+        self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 36864)
+
+        #no dropout
+        #self.dropout = nn.Dropout(0.5)
+
 
 
    
