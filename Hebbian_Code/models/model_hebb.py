@@ -619,7 +619,7 @@ class Net_Hebbian(nn.Module):
         x = self.flatten(x)
 
         """ modified such that the one_layer_reduced model doesn't use dropout"""
-        if self.version == "one_layer_reduced":
+        if self.version == "one_layer_reduced" or self.version == "one_layer_reduced_stl10" or self.version == "one_layer_reduced_greyscale":
                 x = self.fc1(x)
 
         else:
