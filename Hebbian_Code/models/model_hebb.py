@@ -50,7 +50,8 @@ class Net_Hebbian(nn.Module):
 
         # one layer version with 16 filters for stl10
         elif self.version == "one_layer_reduced_stl10":
-            self._build_reduced_one_layer_network_stl10() 
+            self._build_reduced_stl10_one_layer_network() 
+        
 
         #greyscale 1-layer version for mnist (and fmnist)
         elif self.version =="one_layer_reduced_greyscale":
@@ -233,8 +234,6 @@ class Net_Hebbian(nn.Module):
         self.bn1 = nn.BatchNorm2d(1, affine=False)
         self.conv1 = HebbianConv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, **self.hebb_params,
                                    padding=2, t_invert=1)
-        self.pool1 = nn.MaxPool2d(kernel_size=4, stride=2, padding=1)
-        self.activ1 = Triangle(power=0.7)
 
         self.pool1 = nn.MaxPool2d(
             kernel_size=4,
