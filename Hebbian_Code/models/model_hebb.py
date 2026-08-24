@@ -580,6 +580,7 @@ class Net_Hebbian(nn.Module):
 
     def forward_features(self, x):
 
+        # student: ensured that for the reduced models we don't use batch normalisation (don't call batch norm as it doesn't exist)
         if self.version == "one_layer_reduced" or self.version == "one_layer_reduced_stl10" or self.version == "one_layer_reduced_greyscale":
             x = self.pool1(self.activ1(self.conv1(x)))
 

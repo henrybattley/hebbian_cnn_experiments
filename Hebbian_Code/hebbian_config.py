@@ -91,7 +91,7 @@ def get_hebbian_config(version="softhebb"):
         },
 
 
-
+        #student: added configurations for reconstruction driven hebbian updates and the ablation
         "reconstruction_hebbian": {
             'mode': 'reconstruction_hebbian',
             'use_cosine_similarity': False,
