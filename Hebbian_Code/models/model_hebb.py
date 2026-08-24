@@ -579,6 +579,10 @@ class Net_Hebbian(nn.Module):
         self.dropout = nn.Dropout(0.5)
 
     def forward_features(self, x):
+
+        if self.version == "one_layer_reduced" or self.version == "one_layer_reduced_stl10" or self.version == "one_layer_reduced_greyscale":
+            x = self.pool1(self.activ1(self.conv1(x)))
+
         if not self.version == "tumor":
             x = self.pool1(self.activ1(self.conv1(self.bn1(x))))
         else:
