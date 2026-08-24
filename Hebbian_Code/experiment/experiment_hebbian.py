@@ -11,14 +11,14 @@ import warnings
 
 
 
-#Their utils directory is missing from the repo!
-#from utils.logger import Logger
+# student: their utils directory is missing from the repo
+from utils.logger import Logger
 
 
 from torchmetrics import Accuracy, Precision, Recall, F1Score, ConfusionMatrix
 import seaborn as sns
 
-#import wandb #seems only to be used with the logger (which is missing)
+import wandb 
 
 from visualisation.visualizer import plot_ltp_ltd, print_weight_statistics, visualize_data_clusters
 from visualisation.receptive_fields import visualize_filters
@@ -128,14 +128,19 @@ if __name__ == "__main__":
     model = Net_Hebbian(hebb_params=hebb_param, version="softhebb")
     model.to(device)
 
-    """ again there is no Logger in this repo
+
     wandb_logger = Logger(
         f"SoftHebb_Optimal",project='CIFAR10_Dataset', model=model)
     logger = wandb_logger.get_logger() 
-    """
+
     print(hebb_param)
     num_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Parameter Count Total: {num_parameters}")
+
+    # student: Where researcher's mention SoftHebb implementation here, it is presumed that they refer specifically to the recreation of the Journe architecture
+    # since it is not specified that a learning rate scheduler is used for their Optimal-HardWTA model convolution operations for use with Cifar-10.
+    # Researcher's in fact state: "Soft-WTA used a custom per-layer learning rate schedule as detailed in (Journe et al., 2022)" (see page 21 within the paper).
+    # Researcher's do state however that the same learning rates defined here are used within the Optimal-HardWTA model for use with Cifar-10 (see page 24 of their paper)
 
     # Custom learning rate and scheduler for only SoftHebb implementation
     # unsup_optimizer = TensorLRSGD([
@@ -304,21 +309,13 @@ if __name__ == "__main__":
         train_labels = torch.cat(train_labels, dim=0)
         acc, prec, rec, f1_score, conf_matrix = calculate_metrics(train_preds, train_labels, 10)
 
-        """ again no logger
-        logger.log({'train_accuracy': acc, 'train_precision': prec, 'train_recall': rec, 'train_f1_score': f1_score})"""
+        logger.log({'train_accuracy': acc, 'train_precision': prec, 'train_recall': rec, 'train_f1_score': f1_score})
         
-        print(
-        f"Train | "
-        f"Accuracy: {acc.item():.4f} | "
-        f"Precision: {prec.item():.4f} | "
-        f"Recall: {rec.item():.4f} | "
-        f"F1: {f1_score.item():.4f}"
-    )
 
-        #f, ax = plt.subplots(figsize=(15, 10))
-        #sns.heatmap(conf_matrix.clone().detach().cpu().numpy(), annot=True, ax=ax)
-        #logger.log({"train_confusion_matrix": wandb.Image(f)})
-        #plt.close(f)
+        f, ax = plt.subplots(figsize=(15, 10))
+        sns.heatmap(conf_matrix.clone().detach().cpu().numpy(), annot=True, ax=ax)
+        logger.log({"train_confusion_matrix": wandb.Image(f)})
+        plt.close(f)
 
         plt.figure(figsize=(10, 8))
         sns.heatmap(
@@ -330,8 +327,6 @@ if __name__ == "__main__":
         plt.xlabel("Predicted")
         plt.ylabel("True")
         plt.show()
-
-
 
 
         # Evaluation on test set
@@ -366,21 +361,14 @@ if __name__ == "__main__":
         test_preds = torch.cat(test_preds, dim=0)
         test_labels = torch.cat(test_labels, dim=0)
         acc, prec, rec, f1_score, conf_matrix = calculate_metrics(test_preds, test_labels, 10)
-        """ 
+    
         logger.log({'test_accuracy': acc, 'test_precision': prec, 'test_recall': rec, 'test_f1_score': f1_score})
         f, ax = plt.subplots(figsize=(15, 10))
         sns.heatmap(conf_matrix.clone().detach().cpu().numpy(), annot=True, ax=ax)
         logger.log({"test_confusion_matrix": wandb.Image(f)})
-        plt.close(f)"""
+        plt.close(f)
 
-        #again changing to printing
-        print(
-        f"Test  | "
-        f"Accuracy: {acc.item():.4f} | "
-        f"Precision: {prec.item():.4f} | "
-        f"Recall: {rec.item():.4f} | "
-        f"F1: {f1_score.item():.4f}"
-        )
+
 
         # Step the scheduler after each epoch
         scheduler.step()

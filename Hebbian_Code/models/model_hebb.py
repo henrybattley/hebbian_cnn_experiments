@@ -36,24 +36,24 @@ class Net_Hebbian(nn.Module):
         self._build_network()
 
     def _build_network(self):
-        # softhebb is the reference to the Journe proposed architecture (with parameters defaulted to be optimal for cifar-10)
+        # student: softhebb is the reference to the Journe proposed architecture (with parameters defaulted to be optimal for cifar-10)
         if self.version == "softhebb":
             self._build_softhebb_network()
             
-        #extended implementation with the one_layer version of the Journe architecture (for cifar-10)
+        #student: extended implementation with the one_layer version of the Journe architecture (for cifar-10)
         elif self.version == "one_layer":
             self._build_one_layer_network() 
 
-        # and a one layer version with 16 filters to be comparable to our GD models (for cifar-10)
+        # student: and a one layer version with 16 filters to be comparable to our GD models (for cifar-10)
         elif self.version == "one_layer_reduced":
             self._build_reduced_one_layer_network() 
 
-        # one layer version with 16 filters for stl10
+        # student: one layer version with 16 filters for stl10
         elif self.version == "one_layer_reduced_stl10":
             self._build_reduced_stl10_one_layer_network() 
         
 
-        #greyscale 1-layer version for mnist (and fmnist)
+        # student: greyscale 1-layer version for mnist (and fmnist)
         elif self.version =="one_layer_reduced_greyscale":
             self._build_reduced_greyscale_one_layer_network()
 
@@ -107,6 +107,7 @@ class Net_Hebbian(nn.Module):
     #     self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 3072)
     #     self.dropout = nn.Dropout(0.5)
 
+    # student: the Journe Architecture with tuned bcm params and learning rate for optimality on Cifar-10 data
     def _build_softhebb_network(self):
         print("Building SoftHebb model")
         # Layer 1
@@ -121,7 +122,6 @@ class Net_Hebbian(nn.Module):
         self.bn2 = nn.BatchNorm2d(96, affine=False)
         self.conv2 = HebbianConv2d(in_channels=96, out_channels=384, kernel_size=3, stride=1, **self.hebb_params,
                                    t_invert=0.65, padding=1, bcm_theta=0.35, sigma_e=1.0, sigma_i=1.2, lateral_kernel=3,
-                                   #lr=0.005)
                                    lr=0.08)
         self.pool2 = nn.MaxPool2d(kernel_size=4, stride=2, padding=1)
         self.activ2 = Triangle(power=1.4)
@@ -130,7 +130,6 @@ class Net_Hebbian(nn.Module):
         self.bn3 = nn.BatchNorm2d(384, affine=False)
         self.conv3 = HebbianConv2d(in_channels=384, out_channels=1536, kernel_size=3, stride=1, **self.hebb_params,
                                    t_invert=0.25, padding=1, bcm_theta=0.35, sigma_e=0.8, sigma_i=1.1, lateral_kernel=3,
-                                   #lr=0.01)
                                    lr=0.05)
         self.pool3 = nn.AvgPool2d(kernel_size=2, stride=2, padding=0)
         self.activ3 = Triangle(power=1.)
@@ -144,7 +143,7 @@ class Net_Hebbian(nn.Module):
 
 
 
-    #this one layer maintains the bcm parameters specifically optimised by the researcher's for Cifar-10 data
+    # student: this one layer maintains the bcm parameters specifically optimised by the researcher's for Cifar-10 data
     def _build_one_layer_network(self):
         print("Building 1-layer Hebbian model")
 
@@ -184,11 +183,12 @@ class Net_Hebbian(nn.Module):
 
         self.dropout = nn.Dropout(0.5)
 
-    # this one layer version also maintains optimal params for cifar-10 only it has 16 filters and no dropout
+    # student: this one layer version also maintains optimal params for cifar-10 only it has 16 filters and no dropout
     def _build_reduced_one_layer_network(self):
         print("Building 1-layer Hebbian model")
 
-        self.bn1 = nn.BatchNorm2d(3, affine=False)
+        #removed the batchnorm
+        #self.bn1 = nn.BatchNorm2d(3, affine=False)
 
         self.conv1 = HebbianConv2d(
             in_channels=3,
@@ -226,12 +226,13 @@ class Net_Hebbian(nn.Module):
         #self.dropout = nn.Dropout(0.5)
 
 
-    # default params and fc dimensions for mnist data
+    # student: default params and fc dimensions for mnist data
     def _build_reduced_greyscale_one_layer_network(self):
         print("Building 1-layer reduced greyscale Hebbian model")
 
-        # Layer 1
-        self.bn1 = nn.BatchNorm2d(1, affine=False)
+        #removed the batchnorm
+        #self.bn1 = nn.BatchNorm2d(1, affine=False)
+
         self.conv1 = HebbianConv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, **self.hebb_params,
                                    padding=2, t_invert=1)
 
@@ -254,12 +255,14 @@ class Net_Hebbian(nn.Module):
         #self.dropout = nn.Dropout(0.5)
 
 
-    # keep default bcm params and dims for stl-10 1-layer version
+    # student: keep default bcm params and dims for stl-10 1-layer version
     def _build_reduced_stl10_one_layer_network(self):
 
         print("Building 1-layer STL SoftHebb model")
-        # Layer 1
-        self.bn1 = nn.BatchNorm2d(3, affine=False)
+
+        #removed the batchnorm
+        #self.bn1 = nn.BatchNorm2d(3, affine=False)
+
         self.conv1 = HebbianConv2d(in_channels=3, out_channels=16, kernel_size=5, stride=1, **self.hebb_params,
                                     padding=2, t_invert=1)
         
@@ -306,7 +309,7 @@ class Net_Hebbian(nn.Module):
         # Output layers
         self.flatten = nn.Flatten()
 
-        #self.fc1 = nn.Linear(18816, 10) for some reason the dims for the fc are wrong in the repo
+        #self.fc1 = nn.Linear(18816, 10) student:  for some reason the dims for the fc are wrong in the repo (weight.data uses the same below)
 
         self.fc1 = nn.Linear(13824, 10)
 
@@ -446,7 +449,7 @@ class Net_Hebbian(nn.Module):
         # Output layers
         self.flatten = nn.Flatten()
 
-        #self.fc1 = nn.Linear(24576, 10) again some how fc dimensions are incorrect
+        #self.fc1 = nn.Linear(24576, 10) student: again some how fc dimensions are incorrect
         #self.fc1.weight.data = 0.11048543456039805 * torch.rand(10, 24576) 
 
         self.fc1 = nn.Linear(221184, 10)
@@ -596,7 +599,7 @@ class Net_Hebbian(nn.Module):
             x = self.pool2(self.activ2(self.conv2(self.bn2(x))))
             x = self.pool3(self.activ3(self.conv3(self.bn3(x))))
 
-        #our one layer versions of  course just have one sequence of conv operations
+        # student: our one layer versions of course just have one sequence of conv operations
         elif self.version == "one_layer" or self.version == "one_layer_reduced" or self.version == "one_layer_reduced_stl10" or self.version == "one_layer_reduced_greyscale":
             return x
 
@@ -617,7 +620,7 @@ class Net_Hebbian(nn.Module):
         x = self.features_extract(x)
         x = self.flatten(x)
 
-        """ modified such that the one_layer_reduced model doesn't use dropout"""
+        # student: modified such that the one_layer_reduced model doesn't use dropout
         if self.version == "one_layer_reduced" or self.version == "one_layer_reduced_stl10" or self.version == "one_layer_reduced_greyscale":
                 x = self.fc1(x)
 
