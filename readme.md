@@ -7,7 +7,10 @@ The running of models may be found within Hebbian_Code/hebbian_cnn_experiments
 Towards the end of the notebook the evaluation of the 1-layer hebbian model results can be seen
 
 
+<br>
+<br>
 
+The rest of this readme is from Nimmo et al...
 
 
 # Advancing the Biological Plausibility and Efficacy of Hebbian Convolutional Neural Networks
