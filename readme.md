@@ -1,3 +1,15 @@
+# Student:
+
+This repository contains the implementations from Nimmo et al.
+<br>
+The running of models may be found within Hebbian_Code/hebbian_cnn_experiments
+<br>
+Towards the end of the notebook the evaluation of the 1-layer hebbian model results can be seen
+
+
+
+
+
 # Advancing the Biological Plausibility and Efficacy of Hebbian Convolutional Neural Networks
 
 This repository contains an implementation of a biologically-plausible deep learning framework that advances the state-of-the-art in Hebbian learning for Convolutional Neural Networks (CNNs). The framework achieves 76% accuracy on CIFAR-10 through careful integration of biologically-inspired mechanisms while maintaining competitive performance with backpropagation-based approaches. This model used a two-phase training approach: unsupervised Hebbian learning for feature extraction in convolutional layers, followed by a supervised classifier layer trained via backpropagation.
